@@ -1,0 +1,61 @@
+mport random as rand
+
+def initialize_game():
+    directions = {"Q":[1,0,0], "W":[-1,0,0], "E":[0,1,0], "A":[0,-1,0], "S":[0,0,1], "D":[0,0,-1]}
+    snake = [(9,6,6)]
+    head = [9, 7, 6]
+    dirHead = [0, 1, 0]
+    fruit = [9, 13, 6]
+    
+    return (snake, head, dirHead, fruit, directions)
+
+def opposite_direction(direction):
+    return [-direction[i] for i in range(3)]
+
+
+def take_turn(snake, head, dirHead, fruit, directions, lenSnake):
+    oppositeDir = opposite_direction(dirHead)
+    newDirInput = input("Move the snake(QWEASD)").upper()
+
+    while newDirInput not in directions or directions[newDirInput] == oppositeDir:
+        if newDirInput not in directions:
+            newDirInput = input("Please move the snake using valid input(QWEASD): ").upper()
+        else:
+                newDirInput = input("Cant go in the opposite direction, try another one(QWEASD)").upper()
+        
+    newDirHead = directions[newDirInput]
+    dirHead = newDirHead
+    snake.append(head.copy())
+    
+    for i in range(len(newDirHead)):
+        head[i] = head[i] + newDirHead[i]
+        
+    if head != fruit:
+        snake.pop(0)
+    elif head == fruit:
+        while fruit in snake or fruit == head:
+            x = rand.randint(1, 17)
+            y = rand.randint(1, 15)
+            z = rand.randint(1, 13)
+            fruit = [x, y, z]
+            lenSnake +=1
+    if head in snake:
+        print("Game over, you hit the snake :(")
+        lenSnake = -2
+    
+    if head[0] > 17 or head[1] > 15 or head[2] > 13:
+        print('game over, out of bounds')
+        turns = -2
+    if turns != -2:
+        print(f'this is your snake: {snake}')
+        print(f'head location: {head}')
+        print(f"Fruit Location: {fruit}")
+    
+    return snake, head, dirHead, fruit, directions, lenSnake
+
+snake, head, dirHead, fruit, directions = initialize_game()
+
+lenSnake = 2
+while lenSnake < 3315 and lenSnake != -1:
+    snake, head, dirHead, fruit, directions, lenSnake = take_turn(snake, head, dirHead, fruit, directions, lenSnake)
+    
