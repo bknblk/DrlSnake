@@ -59,46 +59,79 @@ class Snake3DEnv(gym.Env):
 
         return observation,info
 
+
+    def _calculate_distance(self, pos1, pos2):
+        return np.sqrt(
+            (pos1[0] - pos2[0])**2 +
+            (pos1[1] - pos2[1])**2 +
+            (pos1[2] - pos2[2])**2
+        )
+
     def step(self, action):
         self.steps += 1
+        
+        old_head = self.snake[0]
+        old_distance = np.sqrt(
+            (old_head[0] - self.food_position[0])**2 +
+            (old_head[1] - self.food_position[1])**2 +
+            (old_head[2] - self.food_position[2])**2
+        )
+        
         if action == self.opposite_actions[self.last_action]:
             action = self.last_action
+        
         self.current_direction = self.action_to_direction[action]
         self.last_action = action
         
         head = self.snake[0]
         new_head = (
-                head[0] + self.current_direction[0],
-                head[1] + self.current_direction[1],
-                head[2] + self.current_direction[2]
+            head[0] + self.current_direction[0],
+            head[1] + self.current_direction[1],
+            head[2] + self.current_direction[2]
         )
-
+        
+        new_distance = np.sqrt(
+            (new_head[0] - self.food_position[0])**2 +
+            (new_head[1] - self.food_position[1])**2 +
+            (new_head[2] - self.food_position[2])**2
+        )
+        
+        distance_reward = (old_distance - new_distance) * 1.0  # Reward for getting closer
+        
         terminated = False
-        reward = -0.01
-
+        
         if not self._is_valid_position(new_head):
             terminated = True
-            reward = -100
+            reward = -10  # Less harsh than before
+        
         elif new_head in self.snake:
             terminated = True
-            reward = -100
+            reward = -10  # Less harsh than before
+        
         elif new_head == self.food_position:
-            reward = 10
+            reward = 100 + distance_reward  # Big reward for food
             self.snake.appendleft(new_head)
             self._spawn_food()
+        
         else:
+            reward = -0.01 + distance_reward  # Small step penalty + distance reward
             self.snake.appendleft(new_head)
-            self.snake.pop()
+            self.snake.pop()  # Remove tail
+        
         truncated = self.steps >= self.max_steps
+        
         observation = self._get_observation()
+        
         info = {
-                'snake_length': len(self.snake),
-                'steps': self.steps,
-                'food_eaten': reward == 10
+            'snake_length': len(self.snake),
+            'steps': self.steps,
+            'food_eaten': reward > 50,  # Changed condition since reward structure changed
+            'distance_to_food': new_distance
         }
+        
+        return observation, reward, terminated, truncated, info    
 
-        return observation, reward, terminated, truncated, info
-    
+
     def _is_valid_position(self, position):
         x, y, z = position
         return (0 <= x < self.grid_size and

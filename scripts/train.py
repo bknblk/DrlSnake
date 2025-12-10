@@ -7,7 +7,7 @@ from src.environment import Snake3DEnv
 from src.agent import DQNAgent
 from src.visualize import TrainingLogger, DetailedEpisodeLogger, print_training_progress
 
-def train(n_episodes=50, batch_size=32, target_update_freq=10, save_freq=25, 
+def train(n_episodes=2, batch_size=32, target_update_freq=10, save_freq=25, 
           log_actions=True, log_action_freq=5):
     """
     Train DQN agent on 3D Snake
@@ -307,7 +307,15 @@ if __name__ == "__main__":
             print("  python scripts/train.py 100      # Custom number of episodes")
             sys.exit(1)
     else:
-        # Default: standard 50-episode run
-        agent, logger = standard_run()
+        # Default: Just 2 episodes for quick sample
+        print("🎮 Quick sample (2 episodes)...\n")
+        agent, logger = train(
+            n_episodes=2,              # ← Changed from 50 to 2
+            batch_size=32,
+            target_update_freq=1,      # Update target every episode
+            save_freq=1,               # Save every episode
+            log_actions=True,
+            log_action_freq=1          # Log every episode
+        )
     
     print("\n🎉 Training session complete!")

@@ -4,16 +4,11 @@ import csv
 import os
 
 class TrainingLogger:
-    """
-    Logs training progress to CSV file
-    """
-    
     def __init__(self, filename='data/training_log.csv'):
         self.filename = filename
         self.data = []
     
     def log_episode(self, episode, reward, steps, epsilon, loss=None):
-        """Record one episode's data"""
         self.data.append({
             'episode': episode,
             'reward': reward,
@@ -23,7 +18,6 @@ class TrainingLogger:
         })
     
     def save(self):
-        """Save all logged data to CSV file"""
         if not self.data:
             return
         
@@ -42,10 +36,6 @@ class TrainingLogger:
 
 
 class DetailedEpisodeLogger:
-    """
-    Logs every action in episodes for detailed analysis
-    """
-    
     def __init__(self, filename='data/episode_actions.csv'):
         self.filename = filename
         self.current_episode = []
@@ -59,12 +49,10 @@ class DetailedEpisodeLogger:
         }
     
     def start_episode(self, episode_num):
-        """Start logging a new episode"""
         self.current_episode = []
         self.episode_num = episode_num
     
     def log_step(self, step, action, snake_head, food_pos, reward, done):
-        """Log one step/action"""
         self.current_episode.append({
             'episode': self.episode_num,
             'step': step,
@@ -81,12 +69,10 @@ class DetailedEpisodeLogger:
         })
     
     def end_episode(self):
-        """Finish logging current episode"""
         self.all_episodes.extend(self.current_episode)
         self.current_episode = []
     
     def save(self):
-        """Save all logged actions to CSV"""
         if not self.all_episodes:
             return
         
@@ -108,7 +94,6 @@ class DetailedEpisodeLogger:
 
 
 def print_training_progress(episode, reward, steps, epsilon, memory_size, avg_reward=None):
-    """Print formatted training progress line"""
     line = (f"Ep {episode:4d} | "
             f"R: {reward:7.2f} | "
             f"Steps: {steps:3d} | "
@@ -121,15 +106,11 @@ def print_training_progress(episode, reward, steps, epsilon, memory_size, avg_re
     print(line)
 
 
-# Placeholder functions that train.py tries to import
 def plot_training_curves(csv_file, save_path):
-    """Placeholder - Person 3 will implement"""
     print("⚠ plot_training_curves not implemented yet")
 
 def analyze_actions(csv_file):
-    """Placeholder - Person 3 will implement"""
     print("⚠ analyze_actions not implemented yet")
 
 def visualize_episode_path(csv_file, episode_num, save_path):
-    """Placeholder - Person 3 will implement"""
     print("⚠ visualize_episode_path not implemented yet")
